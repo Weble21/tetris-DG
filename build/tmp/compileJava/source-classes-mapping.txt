@@ -13,29 +13,37 @@ game/GameBoard.java
  game.GameBoard
 blocks/CBlock.java
  blocks.CBlock
-scoreboard/Score.java
- scoreboard.Score
- scoreboard.ScoreComparator
+file/Score.java
+ file.Score
+ file.ScoreComparator
 blocks/TBlock.java
  blocks.TBlock
 setting/SaveFile.java
  setting.SaveFile
+<<<<<<< HEAD
+blocks/BBlock.java
+ blocks.BBlock
+=======
 setting/KeySetting.java
  setting.KeySetting
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8
 blocks/WBlock.java
  blocks.WBlock
 setting/exception/EmptyKeyException.java
  setting.exception.EmptyKeyException
 blocks/GetRandomBlock.java
  blocks.GetRandomBlock
-setting/SettingMenu.java
- setting.SettingMenu
+<<<<<<< HEAD
+game/FightMenu.java
+ game.FightMenu
 blocks/JBlock.java
  blocks.JBlock
-blocks/ZBlock.java
- blocks.ZBlock
 blocks/OBlock.java
  blocks.OBlock
+blocks/ZBlock.java
+ blocks.ZBlock
+file/ScoreBoardFile.java
+ file.ScoreBoardFile
 game/GameMenu.java
  game.GameMenu
  game.GameMenu$1
@@ -46,14 +54,35 @@ game/GameMenu.java
  game.GameMenu$6
 scoreboard/ScoreBoardMenu.java
  scoreboard.ScoreBoardMenu
+=======
+blocks/BBlock.java
+ blocks.BBlock
+blocks/JBlock.java
+ blocks.JBlock
+blocks/ZBlock.java
+ blocks.ZBlock
+blocks/OBlock.java
+ blocks.OBlock
+file/ScoreBoardFile.java
+ file.ScoreBoardFile
+blocks/SBlock.java
+ blocks.SBlock
+blocks/Block.java
+ blocks.Block
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8
 blocks/LBlock.java
  blocks.LBlock
 game/GamePane.java
  game.GamePane
 game/NextBlockPane.java
  game.NextBlockPane
-scoreboard/ScoreBoardFile.java
- scoreboard.ScoreBoardFile
+<<<<<<< HEAD
+blocks/Block.java
+ blocks.Block
+=======
+main/Tetris.java
+ main.Tetris
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8
 component/StartMenu.java
  component.StartMenu
  component.StartMenu$1
@@ -64,24 +93,28 @@ component/StartMenu.java
  component.StartMenu$6
  component.StartMenu$7
  component.StartMenu$8
+<<<<<<< HEAD
 blocks/SBlock.java
  blocks.SBlock
-blocks/BBlock.java
- blocks.BBlock
-blocks/Block.java
- blocks.Block
 main/Tetris.java
  main.Tetris
+setting/SettingMenu.java
+ setting.SettingMenu
+setting/KeySetting.java
+ setting.KeySetting
+=======
+setting/SettingMenu.java
+ setting.SettingMenu
+game/GameMenu.java
+ game.GameMenu
+ game.GameMenu$1
+ game.GameMenu$2
+ game.GameMenu$3
+ game.GameMenu$4
+ game.GameMenu$5
+ game.GameMenu$6
 game/FightMenu.java
  game.FightMenu
- game.FightMenu$1
- game.FightMenu$10
- game.FightMenu$11
- game.FightMenu$2
- game.FightMenu$3
- game.FightMenu$4
- game.FightMenu$5
- game.FightMenu$6
- game.FightMenu$7
- game.FightMenu$8
- game.FightMenu$9
+scoreboard/ScoreBoardMenu.java
+ scoreboard.ScoreBoardMenu
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8

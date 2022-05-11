@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="setting.SettingMenuTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2022-05-08T14:29:14" hostname="MacBook-Pro-2.local" time="0.031">
-  <properties/>
-  <testcase name="SettingMenu()" classname="setting.SettingMenuTest" time="0.031"/>
-  <system-out><![CDATA[normal mode
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

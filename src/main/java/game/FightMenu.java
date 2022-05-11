@@ -3,7 +3,8 @@ package game;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 
 import javax.swing.*;
@@ -14,22 +15,23 @@ import setting.SettingItem;
 
 import static java.lang.System.currentTimeMillis;
 
-public class FightMenu extends JFrame {
+public class FightMenu extends JFrame implements KeyListener {
 
 	private SettingItem settingItem;
-	private GameBoard [] gameBoard;
-	private GamePane [] gamePane;
+	private GameBoard gameBoard1;
+	private GameBoard gameBoard2;
+	private GamePane gamePane1;
+	private GamePane gamePane2;
 
-	private JLabel [] scoreLabel;
-	private JLabel [] lineLabel;
-	private JLabel [] timeLabel;
-
-	private Timer timer;
-	private Timer timeAttackTimer;
-	private long startTime;
-	private final long exitTime = 60000;
-	private boolean isGameEnded;
-	private int [] pCountNum = {0,0};
+	protected static int initInterval;
+	protected JLabel scoreLabel1;
+	protected JLabel scoreLabel2;
+	protected String gameMode;
+	protected Timer timer;
+	protected long startTime;
+	protected final long exitTime = 60000;
+	protected boolean isTimeAttackMode;
+	protected boolean isGameEnded;
 
 
 	public FightMenu(boolean isItemMode,boolean isTimeAttackMode) throws IOException {
@@ -37,8 +39,7 @@ public class FightMenu extends JFrame {
 		settingItem = SettingItem.getInstance();
 		setSize(settingItem.getBoardWidth() * 2, settingItem.getBoardHeight());
 		SettingItem.isItemMode = isItemMode;
-		settingItem.isTimeAttackMode = isTimeAttackMode;
-		SettingItem.isFightMode = true;
+		this.isTimeAttackMode = isTimeAttackMode;
 		setResizable(false);
 		setBackground(Color.WHITE);
 		setForeground(Color.WHITE);
@@ -49,31 +50,89 @@ public class FightMenu extends JFrame {
 		// lower panel
 		JButton settingButton = new JButton("Settings");
 		JButton startMenuBtn = new JButton("Start Menu");
-		JButton exitBtn = new JButton("EXIT");
+		JButton scoreBoardBtn = new JButton("EXIT");
 		JButton restartBtn = new JButton("restart");
 		settingButton.addActionListener(e -> btnSettingActionPerformed());
 		startMenuBtn.addActionListener(e -> btnStartMenuActionPerformed());
-		exitBtn.addActionListener(e -> btnExitActionPerformed());
+		scoreBoardBtn.addActionListener(e -> btnScoreBoardActionPerformed());
 		restartBtn.addActionListener(e -> btnRestartActionPerformed());
 		JPanel lowerPanel = new JPanel(new GridLayout(0, 4));
 		lowerPanel.add(settingButton);
 		lowerPanel.add(startMenuBtn);
-		lowerPanel.add(exitBtn);
+		lowerPanel.add(scoreBoardBtn);
 		lowerPanel.add(restartBtn);
 
-		//Time Attack Mode
-		if(settingItem.isTimeAttackMode){
-			startTime = currentTimeMillis();
-			setTimeAttackMode();
+		if (isItemMode) {
+			gameBoard1 = new ItemGameBoard();
+			gameBoard2 = new ItemGameBoard();
+			gameMode = "item";
+		} else {
+			gameBoard1 = new GameBoard();
+			gameBoard2 = new GameBoard();
+			gameMode = "regul";
 		}
-		JPanel upperPanel = new JPanel(new GridLayout(0, 2));
-		gameBoard = new GameBoard[2];
-		gamePane = new GamePane[2];
-		scoreLabel = new JLabel[2];
-		lineLabel = new JLabel[2];
-		upperPanel.add(playerPanel(isItemMode,0));
-		upperPanel.add(playerPanel(isItemMode,1));
+		gameBoard1.gamePane.setFontSize(settingItem.getFontSize());
+		gameBoard1.drawBoard();
+		gameBoard2.gamePane.setFontSize(settingItem.getFontSize());
+		gameBoard2.drawBoard();
+		gameBoard1.nextBlockPane.drawNextBlockBoard(gameBoard1.getNextBlock());
+		gameBoard2.nextBlockPane.drawNextBlockBoard(gameBoard2.getNextBlock());
+
+		JPanel sidePanel1 = new JPanel();
+		sidePanel1.setBackground(Color.white);
+		JPanel sidePanel2 = new JPanel();
+		sidePanel2.setBackground(Color.white);
+		gamePane1 = new GamePane();
+		gamePane1.draw();
+		sidePanel1.add(gamePane1);
+		gamePane2 = new GamePane();
+		gamePane2.draw();
+		sidePanel2.add(gamePane2);
+
+		// Side display
+		scoreLabel1 = new JLabel(gameBoard1.getScore() + "", JLabel.CENTER);
+		TitledBorder tborder = new TitledBorder("SCORE");
+		tborder.setTitlePosition(TitledBorder.ABOVE_TOP);
+		tborder.setTitleJustification(TitledBorder.CENTER);
+		scoreLabel1.setBorder(tborder);
+		scoreLabel1.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 17));
+		scoreLabel1.setBackground(Color.white);
+
+		// Side display
+		scoreLabel2 = new JLabel(gameBoard2.getScore() + "", JLabel.CENTER);
+		scoreLabel2.setBorder(tborder);
+		scoreLabel2.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 17));
+		scoreLabel2.setBackground(Color.white);
 		updateScore();
+
+		// left panel
+		JPanel rightPanel1 = new JPanel();
+		rightPanel1.setLayout(new BoxLayout(rightPanel1, BoxLayout.Y_AXIS));
+		rightPanel1.add(gameBoard1.nextBlockPane);
+		rightPanel1.add(scoreLabel1);
+		rightPanel1.add(sidePanel1);
+		rightPanel1.setAlignmentX(LEFT_ALIGNMENT);
+		rightPanel1.setBackground(Color.WHITE);
+		JPanel rightPanel2 = new JPanel();
+		rightPanel2.setLayout(new BoxLayout(rightPanel2, BoxLayout.Y_AXIS));
+		rightPanel2.add(gameBoard2.nextBlockPane);
+		rightPanel2.add(scoreLabel2);
+		rightPanel2.add(sidePanel2);
+		rightPanel2.setAlignmentX(LEFT_ALIGNMENT);
+		rightPanel2.setBackground(Color.WHITE);
+
+		// upper panel
+		JPanel panel1 = new JPanel();
+		panel1.add(gameBoard1);
+		panel1.add(rightPanel1);
+		panel1.setBackground(Color.white);
+		JPanel panel2 = new JPanel();
+		panel2.add(gameBoard2);
+		panel2.add(rightPanel2);
+		panel2.setBackground(Color.white);
+		JPanel upperPanel = new JPanel(new GridLayout(0, 2));
+		upperPanel.add(panel1);
+		upperPanel.add(panel2);
 
 		// outer panel
 		JPanel outerPanel = new JPanel();
@@ -83,344 +142,227 @@ public class FightMenu extends JFrame {
 		outerPanel.setForeground(Color.WHITE);
 
 		// Set timer for block drops.
-		String message = "PLAYER1:"+settingItem.getP1LeftKey()+" "+settingItem.getP1RightKey()+" "
-				+settingItem.getP1DownKey()+" "+settingItem.getP1RotateKey()+" "+settingItem.getP1DropKey()
-				+"\nPLAYER2:"+settingItem.getP2LeftKey()+" "+ settingItem.getP2RightKey()+" "+settingItem.getP2DownKey()+" "
-				+settingItem.getP2RotateKey()+" "+settingItem.getP2DropKey();
-		JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), message);
+		initInterval = settingItem.getInitInterval();
+<<<<<<< HEAD
+		JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "PLAYER1: A,S,D,W(rotate),SPACE BAR(drop)\nPLAYER2: Arrow keys, ENTER(drop)");
+=======
+		JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "PLAYER1: A←,S↓,D→,W(rotate),SPACE BAR(drop)\nPLAYER2: Arrow keys, ENTER(drop)");
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8
+		startTime = currentTimeMillis();
+		addKeyListener(this);
+		setTimer();
 		setFocusable(true);
 		requestFocus();
-		initControls();
-		setTimer(settingItem.getReduceSpeed());
 	}
 
-	private JPanel playerPanel(boolean isItemMode, int i) throws IOException {
-		if (isItemMode) {
-			gameBoard[i] = new ItemGameBoard();
-		} else {
-			gameBoard[i] = new GameBoard();
-		}
-		gameBoard[i].gamePane.setFontSize(settingItem.getFontSize());
-		gameBoard[i].drawBoard();
-		gameBoard[i].nextBlockPane.drawNextBlockBoard(gameBoard[i].getNextBlock());
-
-		JPanel sidePanel = new JPanel();
-		sidePanel.setBackground(Color.white);
-		gamePane[i] = new GamePane();
-		gamePane[i].draw();
-		sidePanel.add(gamePane[i]);
-
-		// Side display
-		scoreLabel[i] = new JLabel(gameBoard[i].getScore() + "", JLabel.CENTER);
-		TitledBorder border = new TitledBorder("SCORE");
-		border.setTitlePosition(TitledBorder.ABOVE_TOP);
-		border.setTitleJustification(TitledBorder.CENTER);
-		scoreLabel[i].setBorder(border);
-		scoreLabel[i].setFont(new Font(Font.MONOSPACED, Font.PLAIN, 17));
-		scoreLabel[i].setBackground(Color.white);
-		lineLabel[i] = new JLabel(gameBoard[i].getLineNum() + "", JLabel.CENTER);
-		TitledBorder border2 = new TitledBorder("LINE");
-		border2.setTitlePosition(TitledBorder.ABOVE_TOP);
-		border2.setTitleJustification(TitledBorder.CENTER);
-		lineLabel[i].setBorder(border2);
-		lineLabel[i].setFont(new Font(Font.MONOSPACED, Font.PLAIN, 17));
-		lineLabel[i].setBackground(Color.white);
-
-		// left panel
-		JPanel rightPanel = new JPanel();
-		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-		if(SettingItem.isTimeAttackMode)
-			rightPanel.add(timeLabel[i]);
-		rightPanel.add(gameBoard[i].nextBlockPane);
-		rightPanel.add(scoreLabel[i]);
-		rightPanel.add(lineLabel[i]);
-		rightPanel.add(sidePanel);
-		rightPanel.setAlignmentX(LEFT_ALIGNMENT);
-		rightPanel.setBackground(Color.WHITE);
-
-		// upper panel
-		JPanel panel = new JPanel();
-		panel.add(gameBoard[i]);
-		panel.add(rightPanel);
-		panel.setBackground(Color.white);
-
-		return panel;
-	}
-	protected void initControls() {
-		JRootPane rootPane = this.getRootPane();
-		InputMap im = rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-		ActionMap am = rootPane.getActionMap();
-
-		im.put(KeyStroke.getKeyStroke(settingItem.getP1RightKey()), "right1");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP1LeftKey()), "left1");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP1RotateKey()), "up1");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP1DownKey()), "down1");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP1DropKey()), "space1");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP2RightKey()), "right2");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP2LeftKey()), "left2");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP2RotateKey()), "up2");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP2DownKey()), "down2");
-		im.put(KeyStroke.getKeyStroke(settingItem.getP2DropKey()), "space2");
-		im.put(KeyStroke.getKeyStroke(settingItem.getPauseKey()), "pause");
-
-		am.put("right1", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning() && !isGameEnded)
-					gameBoard[0].moveRight();
-			}
-		});
-		am.put("left1", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning()&& !isGameEnded)
-					gameBoard[0].moveLeft();
-			}
-		});
-		am.put("up1", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning()&& !isGameEnded)
-					gameBoard[0].rotateBlock();
-			}
-		});
-		am.put("down1", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning()&& !isGameEnded)
-					moveDown(0);
-			}
-		});
-		am.put("space1", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning()&& !isGameEnded) {
-					gameBoard[0].dropBlock();
-					if(newBlock(0)){
-						gameBoard[0].placeBlock();
-					} else{
-						if(!isGameEnded){
-							gameBoard[0].placeBlock();
-							gameBoard[0].drawBoard();
-						}
-					}
-				}
-			}
-		});
-		am.put("right2", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning() && !isGameEnded)
-					gameBoard[1].moveRight();
-			}
-		});
-		am.put("left2", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning() && !isGameEnded)
-					gameBoard[1].moveLeft();
-			}
-		});
-		am.put("up2", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning() && !isGameEnded)
-					gameBoard[1].rotateBlock();
-			}
-		});
-		am.put("down2", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning() && !isGameEnded)
-					moveDown(1);
-			}
-		});
-		am.put("space2", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (timer.isRunning() && !isGameEnded)  {
-					gameBoard[1].dropBlock();
-					if(newBlock(1)){
-						gameBoard[1].placeBlock();
-					} else{
-						if(!isGameEnded){
-							gameBoard[1].placeBlock();
-							gameBoard[1].drawBoard();
-						}
-					}
-				}
-			}
-		});
-		am.put("pause", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				pause();
-			}
-		});
-	}
-
-	protected void setTimer(int initInterval) {
+	protected void setTimer() {
 		timer = new Timer(initInterval, e -> {
-			for(int i=0;i<2;i++){
-				pCountNum[i]++;
-				int temp = (11-gameBoard[i].getLevel())<=0?1:(11-gameBoard[i].getLevel());
-				if(pCountNum[i]>=temp) {
-					moveDown(i);
-					System.out.println("p"+i+": "+initInterval*pCountNum[i]);
-					pCountNum[i] = 0;
-				}
-			}
+			moveDown(gameBoard1);
+			moveDown(gameBoard2);
 			updateScore();
 		});
 		timer.start();
 	}
-	protected void setTimeAttackMode(){
-		timeLabel = new JLabel[2];
-		timeLabel[0] = new JLabel((exitTime-(currentTimeMillis()-startTime))+"");
-		timeLabel[1] = new JLabel((exitTime-(currentTimeMillis()-startTime))+"");
-		timeAttackTimer= new Timer(10, e -> {
-			if(settingItem.isTimeAttackMode && currentTimeMillis()-startTime>exitTime){
-				gameOver();
-			} else {
-				timeLabel[0].setText(((exitTime-(currentTimeMillis()-startTime))/1000)+"");
-				timeLabel[1].setText(((exitTime-(currentTimeMillis()-startTime))/1000)+"");
-			}
-		});
-		timeAttackTimer.start();
-	}
 
 	protected void updateScore() {
-		for(int i=0;i<2;i++){
-			scoreLabel[i].setText(String.format("%5s", gameBoard[i].getScore()+ "") + " ");
-			lineLabel[i].setText(String.format("%5s", gameBoard[i].getLineNum() + "") + " ");
-			int temp = (i==0)?1:0;
-			if (gameBoard[i].getErasedLine().length > 1)
-				gamePane[temp].setLines(gameBoard[i].getErasedLine());
-			if (gameBoard[i].getLineNum() / 7 >= gameBoard[i].getLevel()) {
-				gameBoard[i].setLevel(gameBoard[i].getLevel() + 1);
-			}
+		scoreLabel1.setText(String.format("%5s", gameBoard1.getScore() + "") + " ");
+		scoreLabel2.setText(String.format("%5s", gameBoard2.getScore() + "") + " ");
+		if (Math.max(gameBoard1.getLineNum(), gameBoard2.getLineNum()) / 7 >= gameBoard1.getLevel()) {
+			gameBoard1.setLevel(gameBoard1.getLevel() + 1);
+			gameBoard2.setLevel(gameBoard2.getLevel() + 1);
+			initInterval -= settingItem.getReduceSpeed();
+			timer.stop();
+			setTimer();
 		}
+		if (gameBoard1.getErasedLine().length > 1)
+			gamePane2.setLines(gameBoard1.getErasedLine());
+		if (gameBoard2.getErasedLine().length > 1)
+			gamePane1.setLines(gameBoard2.getErasedLine());
 	}
 
 	public void pause() {
-		if (!timer.isRunning() && !isGameEnded) {
+		if (!timer.isRunning()) {
 			timer.start();
-			gameBoard[0].drawBoard();
-			gameBoard[1].drawBoard();
-		} else if(timer.isRunning() && !isGameEnded) {
+			gameBoard1.drawBoard();
+			gameBoard2.drawBoard();
+		} else {
 			timer.stop();
-			gameBoard[0].setGameBoardText("PAUSE");
-			gameBoard[1].setGameBoardText("PAUSE");
+			gameBoard1.setGameBoardText("PAUSE");
+			gameBoard2.setGameBoardText("PAUSE");
 		}
 	}
 
-	protected void moveDown(int i) {
-		if (!gameBoard[i].moveDown()) {
-			if(newBlock(i)){
-				gameBoard[i].placeBlock();
+	protected void moveDown(GameBoard gameBoard) {
+		if (!gameBoard.moveDown()) {
+			if(newBlock(gameBoard)){
+				gameBoard.placeBlock();
 			} else{
-				gameBoard[i].placeBlock();
-				gameBoard[i].drawBoard();
+				gameBoard.placeBlock();
+				gameBoard.drawBoard();
 			}
 		} else{
-			gameBoard[i].placeBlock();
-			gameBoard[i].drawBoard();
+			gameBoard.placeBlock();
+			gameBoard.drawBoard();
 		}
+
+		if(isGameEnded)
+			return;
 	}
 
-	protected boolean newBlock(int i) {
-		gameBoard[i].placeBlock(); // 밑으로 내려가지 않게 고정
-		if (gameBoard[i].isGameEnded()) {
+	protected boolean newBlock(GameBoard gameBoard) {
+		gameBoard.placeBlock(); // 밑으로 내려가지 않게 고정
+		System.out.println(currentTimeMillis()-startTime);
+		if (gameBoard.isGameEnded() || (isTimeAttackMode && currentTimeMillis()-startTime>exitTime)) {
+			timer.stop();
+			isGameEnded = true;
 			gameOver();
 			return false;
 		}
-		setErasedLine(i);
-		boolean isErased = gameBoard[i].eraseLine();
-
-		gameBoard[i].curr = gameBoard[i].nextBlock;
-		if(SettingItem.isItemMode && (gameBoard[i].lineNum/gameBoard[i].count >= gameBoard[i].lineChange)) {
-			gameBoard[i].nextBlock = gameBoard[i].getRandomBlock.getItemBlock(gameBoard[i].modeName);
-			gameBoard[i].count = gameBoard[i].count+1;
+		if(gameBoard==gameBoard1) {
+			gameBoard.gamePane.addLines(gameBoard2.erasedLine);
+			gameBoard2.resetErasedLine();
+			gamePane1.setLines(gameBoard2.getErasedLine());
 		} else {
-			gameBoard[i].nextBlock = gameBoard[i].getRandomBlock.getRandomBlockMode(gameBoard[i].modeName);
+			gameBoard.gamePane.addLines(gameBoard1.erasedLine);
+			gameBoard1.resetErasedLine();
+			gamePane2.setLines(gameBoard1.getErasedLine());
 		}
-		gameBoard[i].x = 3;
-		gameBoard[i].y = 0;
-		gameBoard[i].nextBlockPane.drawNextBlockBoard(gameBoard[i].getNextBlock());
+		boolean isErased = gameBoard.eraseLine();
+		gameBoard.curr = gameBoard.nextBlock;
+		if(SettingItem.isItemMode && (gameBoard.lineNum/gameBoard.count >= gameBoard.lineChange)) {
+			gameBoard.nextBlock = gameBoard.getRandomBlock.getItemBlock(gameBoard.modeName);
+			gameBoard.count = gameBoard.count+1;
+		} else {
+			gameBoard.nextBlock = gameBoard.getRandomBlock.getRandomBlockMode(gameBoard.modeName);
+		}
+		gameBoard.x = 3;
+		gameBoard.y = 0;
+		gameBoard.nextBlockPane.drawNextBlockBoard(gameBoard.getNextBlock());
 		return isErased;
 	}
-
-	protected void setErasedLine(int i){
-		int temp = (i == 0) ? 1:0;
-		gameBoard[i].gamePane.addLines(gameBoard[temp].erasedLine);
-		gameBoard[temp].resetErasedLine();
-		gamePane[i].setLines(gameBoard[temp].getErasedLine());
-	}
-
 	private void gameOver() {
-		timer.stop();
-		if(SettingItem.isTimeAttackMode)
-			timeAttackTimer.stop();
-		isGameEnded = true;
-		setResultText();
-	}
-
-	private void setResultText() {
 		String text = "draw";
-		if(gameBoard[0].isGameEnded() && !gameBoard[1].isGameEnded()) {
-			gameBoard[0].setGameBoardText("LOSE");
-			gameBoard[1].setGameBoardText("WIN!");
+		if(gameBoard1.isGameEnded() && !gameBoard2.isGameEnded()) {
+			gameBoard1.setGameBoardText("LOSE");
+			gameBoard2.setGameBoardText("WIN!");
 			text = "player2 win";
-		} else if(!gameBoard[0].isGameEnded() && gameBoard[1].isGameEnded()){
-			gameBoard[0].setGameBoardText("WIN!");
-			gameBoard[1].setGameBoardText("LOSE");
+		} else if(!gameBoard1.isGameEnded() && gameBoard2.isGameEnded()){
+			gameBoard1.setGameBoardText("WIN!");
+			gameBoard2.setGameBoardText("LOSE");
 			text = "player1 win";
+		} else if(gameBoard1.isGameEnded() && gameBoard2.isGameEnded()){
+			gameBoard1.setGameBoardText("DRAW!");
+			gameBoard2.setGameBoardText("DRAW!");
 		} else{
-			if(gameBoard[0].score>gameBoard[1].score){
-				gameBoard[0].setGameBoardText("WIN!");
-				gameBoard[1].setGameBoardText("LOSE");
+			if(gameBoard1.score>gameBoard2.score){
+				gameBoard1.setGameBoardText("WIN!");
+				gameBoard2.setGameBoardText("LOSE");
 				text = "player1 win";
-			} else if(gameBoard[0].score<gameBoard[1].score){
-				gameBoard[0].setGameBoardText("LOSE");
-				gameBoard[1].setGameBoardText("WIN!");
+			} else if(gameBoard1.score<gameBoard2.score){
+				gameBoard1.setGameBoardText("LOSE");
+				gameBoard2.setGameBoardText("WIN!");
 				text = "player2 win";
-			} else if(gameBoard[0].score==gameBoard[1].score){
-				gameBoard[0].setGameBoardText("DRAW!");
-				gameBoard[1].setGameBoardText("DRAW!");
+			} else{
+				gameBoard1.setGameBoardText("DRAW!");
+				gameBoard2.setGameBoardText("DRAW!");
 			}
 		}
 		JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), text);
 	}
-	private void exitGame() {
-		timer.stop();
-		if(SettingItem.isTimeAttackMode)
-			timeAttackTimer.stop();
-		dispose();
-	}
 
-	private void btnExitActionPerformed() {
-		exitGame();
+	private void btnScoreBoardActionPerformed() {
+		timer.stop();
+		dispose();
 		System.exit(0);
 	}
 
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			if (timer.isRunning())
+				gameBoard2.moveRight();
+		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			if (timer.isRunning())
+				gameBoard2.moveLeft();
+		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+			if (timer.isRunning()) {
+				moveDown(gameBoard2);
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
+			if (timer.isRunning())
+				gameBoard2.rotateBlock();
+		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (timer.isRunning()) {
+				gameBoard2.dropBlock();
+				if(newBlock(gameBoard2)){
+					gameBoard2.placeBlock();
+				} else{
+					if(!isGameEnded){
+						gameBoard2.placeBlock();
+						gameBoard2.drawBoard();
+					}
+				}
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_D) {
+			if (timer.isRunning())
+				gameBoard1.moveRight();
+		} else if (e.getKeyCode() == KeyEvent.VK_A) {
+			if (timer.isRunning())
+				gameBoard1.moveLeft();
+		} else if (e.getKeyCode() == KeyEvent.VK_S) {
+			if (timer.isRunning())
+				moveDown(gameBoard1);
+		} else if (e.getKeyCode() == KeyEvent.VK_W) {
+			if (timer.isRunning())
+				gameBoard1.rotateBlock();
+		} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			if (timer.isRunning()) {
+				gameBoard1.dropBlock();
+				if(newBlock(gameBoard1)){
+					gameBoard1.placeBlock();
+				} else{
+					if(!isGameEnded){
+						gameBoard1.placeBlock();
+						gameBoard1.drawBoard();
+					}
+				}
+			}
+		} else if (e.getKeyCode() == KeyEvent.VK_P) {
+			pause();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stud
+	}
+
 	private void btnSettingActionPerformed() {
-		exitGame();
+		timer.stop();
+		dispose();
 		Tetris.showSettingMenu();
 	}
 
 	private void btnStartMenuActionPerformed() {
-		exitGame();
+		timer.stop();
+		dispose();
 		Tetris.showStartMenu();
 	}
 
 	private void btnRestartActionPerformed() {
-		exitGame();
+		timer.stop();
+		dispose();
 		try {
-			Tetris.start(false);
-			//to be edited
+			Tetris.start();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		//to be edited
 	}
 }

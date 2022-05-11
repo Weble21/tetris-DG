@@ -3,7 +3,7 @@ package setting;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import scoreboard.ScoreBoardFile;
+import file.ScoreBoardFile;
 
 import javax.swing.*;
 import java.io.File;
@@ -30,16 +30,6 @@ public class SettingItem {
     private String downKey;
     private String rotateKey;
     private String dropKey;
-    private String p1LeftKey;
-    private String p1RightKey;
-    private String p1DownKey;
-    private String p1RotateKey;
-    private String p1DropKey;
-    private String p2LeftKey;
-    private String p2RightKey;
-    private String p2DownKey;
-    private String p2RotateKey;
-    private String p2DropKey;
     private String pauseKey;
     private int boardWidth;
     private int boardHeight;
@@ -49,8 +39,6 @@ public class SettingItem {
     private boolean isColorBlind;
     private int reduceSpeed;
     public static boolean isItemMode;
-    public static boolean isFightMode;
-    public static boolean isTimeAttackMode;
 
     public static final int SMALL_WIDTH = 300;
     public static final int MEDIUM_WIDTH = 350;
@@ -82,19 +70,6 @@ public class SettingItem {
         reduceSpeed = Integer.parseInt(saveFile.get("reduceSpeed"));
         modeName = saveFile.get("modeName");
         isColorBlind = Boolean.parseBoolean(saveFile.get("colorBlind"));
-
-        p1LeftKey = saveFile.get("p1LeftKey");
-        p1RightKey = saveFile.get("p1RightKey");
-        p1DownKey = saveFile.get("p1DownKey");
-        p1RotateKey = saveFile.get("p1RotateKey");
-        p1DropKey = saveFile.get("p1DropKey");
-
-        p2LeftKey = saveFile.get("p2LeftKey");
-        p2RightKey = saveFile.get("p2RightKey");
-        p2DownKey = saveFile.get("p2DownKey");
-        p2RotateKey = saveFile.get("p2RotateKey");
-        p2DropKey = saveFile.get("p2DropKey");
-
     }
 
     /**
@@ -112,8 +87,7 @@ public class SettingItem {
     public void btnSaveSettingActionPerformed() throws IOException {
 
         SaveFile saveFile = new SaveFile(leftKey, rightKey, downKey, rotateKey, dropKey, pauseKey,
-                initInterval, reduceSpeed, modeName, boardWidth, boardHeight, fontSize, isColorBlind,p1LeftKey,p1RightKey,p1DownKey,p1RotateKey,p1DropKey,
-                p2LeftKey,p2RightKey,p2DownKey,p2RotateKey,p2DropKey);
+                initInterval, reduceSpeed, modeName, boardWidth, boardHeight, fontSize, isColorBlind);
         objectMapper.writeValue(new File("savefile.json"), saveFile);
     }
 
@@ -131,16 +105,6 @@ public class SettingItem {
         rotateKey = "UP";
         dropKey = "SPACE";
         pauseKey = "P";
-        p1LeftKey = "A";
-        p1RightKey = "D";
-        p1DownKey = "S";
-        p1RotateKey = "W";
-        p1DropKey = "SPACE";
-        p2LeftKey = "LEFT";
-        p2RightKey = "RIGHT";
-        p2DownKey = "DOWN";
-        p2RotateKey = "UP";
-        p2DropKey = "ENTER";
     }
 
     /**
@@ -183,7 +147,11 @@ public class SettingItem {
         // score board init logic
         ScoreBoardFile sb = new ScoreBoardFile();
         sb.eraseFile();
+<<<<<<< HEAD
         JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Score Board have been reset.");
+=======
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "스코어보드가 초기화 되었습니다..");
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8
     }
 
     /**
@@ -227,46 +195,6 @@ public class SettingItem {
         return dropKey;
     }
 
-    public String getP1LeftKey() {
-        return p1LeftKey;
-    }
-
-    public String getP1RightKey() {
-        return p1RightKey;
-    }
-
-    public String getP1DownKey() {
-        return p1DownKey;
-    }
-
-    public String getP1RotateKey() {
-        return p1RotateKey;
-    }
-
-    public String getP1DropKey() {
-        return p1DropKey;
-    }
-
-    public String getP2LeftKey() {
-        return p2LeftKey;
-    }
-
-    public String getP2RightKey() {
-        return p2RightKey;
-    }
-
-    public String getP2DownKey() {
-        return p2DownKey;
-    }
-
-    public String getP2RotateKey() {
-        return p2RotateKey;
-    }
-
-    public String getP2DropKey() {
-        return p2DropKey;
-    }
-
     public String getPauseKey() {
         return pauseKey;
     }
@@ -297,49 +225,24 @@ public class SettingItem {
         return isColorBlind;
     }
 
-    public void setLeftKey(String leftKey, int player) {
-        if(player==0)
-            this.leftKey = leftKey;
-        else if(player==1)
-            this.p1LeftKey = leftKey;
-        else
-            this.p2LeftKey = leftKey;
+    public void setLeftKey(String leftKey) {
+        this.leftKey = leftKey;
     }
 
-    public void setRightKey(String rightKey, int player) {
-        if(player==0)
-            this.rightKey = rightKey;
-        else if(player==1)
-            this.p1RightKey = rightKey;
-        else
-            this.p2RightKey = rightKey;
+    public void setRightKey(String rightKey) {
+        this.rightKey = rightKey;
     }
 
-    public void setDownKey(String downKey, int player) {
-        if(player==0)
-            this.downKey = downKey;
-        else if(player==1)
-            this.p1DownKey = downKey;
-        else
-            this.p2DownKey = downKey;
+    public void setDownKey(String downKey) {
+        this.downKey = downKey;
     }
 
-    public void setRotateKey(String rotateKey, int player) {
-        if(player==0)
-            this.rotateKey = rotateKey;
-        else if(player==1)
-            this.p1RotateKey = rotateKey;
-        else
-            this.p2RotateKey = rotateKey;
+    public void setRotateKey(String rotateKey) {
+        this.rotateKey = rotateKey;
     }
 
-    public void setDropKey(String dropKey, int player) {
-        if(player==0)
-            this.dropKey = dropKey;
-        else if(player==1)
-            this.p1DropKey = dropKey;
-        else
-            this.p2DropKey = dropKey;
+    public void setDropKey(String dropKey) {
+        this.dropKey = dropKey;
     }
 
 }
