@@ -1,0 +1,9 @@
+<<<<<<< HEAD
+Manifest-Version: 1.0
+Main-Class: main.Tetris
+
+=======
+Manifest-Version: 1.0
+Main-Class: main.Tetris
+
+>>>>>>> 1c68e7c98bba8b52e7ce3f6959fb66042183d6a8
