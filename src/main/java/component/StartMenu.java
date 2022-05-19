@@ -63,6 +63,10 @@ public class StartMenu extends JFrame {
 	private ImageIcon multiplay = new ImageIcon("images/multiPlay.png");
 	private JButton playMode = new JButton(singleplay);
 
+	private ImageIcon timerStartBasic = new ImageIcon("images/timerStart.png");
+	private ImageIcon timerStartClicked = new ImageIcon("images/timerStartClicked.png");
+	private JButton timerStart = new JButton(timerStartBasic);
+
 	int cnt = 0;
 	int step = 0;
 	int isMulti = 0;
@@ -90,6 +94,7 @@ public class StartMenu extends JFrame {
 		imagepanel.add(menuExit);
 		imagepanel.add(icon);
 		imagepanel.add(playMode);
+		imagepanel.add(timerStart);
 		setVisible(true);
 		menuStart.requestFocus();
 
@@ -159,6 +164,43 @@ public class StartMenu extends JFrame {
 					ioException.printStackTrace();
 				}
 				// normal start
+			}
+		});
+
+		//timer start
+		timerStart.setBounds(115, 290,130, 40);
+		timerStart.setBorderPainted(false);
+		timerStart.setContentAreaFilled(false);
+		timerStart.setFocusPainted(false);
+		timerStart.setVisible(false);
+		timerStart.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				menuStart.setIcon(menuStartBasic);
+				itemStart.setIcon(itemStartBasic);
+				normalStart.setIcon(normalStartBasic);
+				timerStart.setIcon(timerStartClicked);
+				menuOption.setIcon(menuOptionBasic);
+				menuSB.setIcon(menuSBBasic);
+				menuExit.setIcon(menuExitBasic);
+				timerStart.setCursor(new Cursor(HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				timerStart.setIcon(timerStartBasic);
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				dispose();
+				try {
+					Tetris.start(SettingItem.isFightMode, false, true);
+
+				} catch (IOException ioException) {
+					ioException.printStackTrace();
+				}
+				// timer start
 			}
 		});
 
@@ -237,11 +279,16 @@ public class StartMenu extends JFrame {
 					menuStart.setIcon(menuStartPressed);
 					normalStart.setVisible(true);
 					itemStart.setVisible(true);
+					if(isMulti == 1)
+						timerStart.setVisible(true);
+					else
+						timerStart.setVisible(false);
 					cnt++;
 				} else {
 					menuStart.setIcon(menuStartBasic);
 					itemStart.setVisible(false);
 					normalStart.setVisible(false);
+					timerStart.setVisible(false);
 					cnt--;
 				}
 
@@ -267,12 +314,13 @@ public class StartMenu extends JFrame {
 							menuExit.setIcon(menuExitBasic);
 							step = 0;
 						} else {
-							if (step < 2)
+							if (step < 3)
 								step++;
 							if (step == 1) {
 								normalStart.setIcon(normalStartClicked);
 								menuStart.setIcon(menuStartBasic);
 								itemStart.setIcon(itemStartBasic);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitBasic);
@@ -281,14 +329,26 @@ public class StartMenu extends JFrame {
 								normalStart.setIcon(normalStartBasic);
 								menuStart.setIcon(menuStartBasic);
 								itemStart.setIcon(itemStartClicked);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitBasic);
 							}
+							if (step == 3) {
+								normalStart.setIcon(normalStartBasic);
+								menuStart.setIcon(menuStartBasic);
+								itemStart.setIcon(itemStartBasic);
+								timerStart.setIcon(timerStartClicked);
+								menuOption.setIcon(menuOptionBasic);
+								menuSB.setIcon(menuSBBasic);
+								menuExit.setIcon(menuExitBasic);
+							}
+
 							if (step == 0) {
 								normalStart.setIcon(normalStartBasic);
 								menuStart.setIcon(menuStartClicked);
 								itemStart.setIcon(itemStartBasic);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitBasic);
@@ -321,6 +381,7 @@ public class StartMenu extends JFrame {
 								normalStart.setIcon(normalStartClicked);
 								menuStart.setIcon(menuStartBasic);
 								itemStart.setIcon(itemStartBasic);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitBasic);
@@ -329,14 +390,17 @@ public class StartMenu extends JFrame {
 								normalStart.setIcon(normalStartBasic);
 								menuStart.setIcon(menuStartBasic);
 								itemStart.setIcon(itemStartClicked);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitBasic);
 							}
+
 							if(step == 0) {
 								normalStart.setIcon(normalStartBasic);
 								menuStart.setIcon(menuStartClicked);
 								itemStart.setIcon(itemStartBasic);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitBasic);
@@ -345,6 +409,7 @@ public class StartMenu extends JFrame {
 								normalStart.setIcon(normalStartBasic);
 								menuStart.setIcon(menuStartBasic);
 								itemStart.setIcon(itemStartBasic);
+								timerStart.setIcon(timerStartBasic);
 								menuOption.setIcon(menuOptionBasic);
 								menuSB.setIcon(menuSBBasic);
 								menuExit.setIcon(menuExitClicked);
@@ -389,11 +454,16 @@ public class StartMenu extends JFrame {
 							menuStart.setIcon(menuStartPressed);
 							itemStart.setVisible(true);
 							normalStart.setVisible(true);
+							if(isMulti == 1)
+								timerStart.setVisible(true);
+							else
+								timerStart.setVisible(false);
 							cnt++;
 						} else {
 							menuStart.setIcon(menuStartBasic);
 							itemStart.setVisible(false);
 							normalStart.setVisible(false);
+							timerStart.setVisible(false);
 							cnt--;
 						}
 
